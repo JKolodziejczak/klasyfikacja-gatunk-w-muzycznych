@@ -31,7 +31,7 @@ def test(dir):
     for base, dirs, files in os.walk(APP_FOLDER):
         for file in files:
             signal_file = base + file
-            signal, sr = librosa.load(signal_file, duration=5.0)
+            signal, sr = librosa.load(signal_file, duration=30.0)
             signal = np.interp(signal, (signal.min(), signal.max()), (-1, 1))
             plt.plot(signal)
             plt.title(file)
@@ -93,6 +93,9 @@ def save_to_csv(path):
 
             length = len(audio)
 
+            # if length<110200:
+            #     continue
+
             splitted_path = base.split("/")
             genre = splitted_path[len(splitted_path) - 1]
 
@@ -129,11 +132,11 @@ def save_to_csv(path):
                 np.var(mfcc.T, axis=0),
             ])
 
-            create_row_to_save(file, str(length), mfccs_features, genre, writer)
+            create_row_to_save(str(length), mfccs_features, genre, writer)
 
 
-def create_row_to_save(file, length, mfccs_features, genre, writer):
-    row = [file, length]
+def create_row_to_save(length, mfccs_features, genre, writer):
+    row = [length]
     for y in mfccs_features:
         row.append(y)
     row.append(genre)
@@ -141,7 +144,7 @@ def create_row_to_save(file, length, mfccs_features, genre, writer):
 
 
 def create_csv_file_with_labels():
-    labels = ["filename", "length", "chroma_stft_mean", "chroma_stft_var", "rms_mean", "rms_var",
+    labels = ["length", "chroma_stft_mean", "chroma_stft_var", "rms_mean", "rms_var",
               "spectral_centroid_mean",
               "spectral_centroid_var", "spectral_bandwidth_mean", "spectral_bandwidth_var", "rolloff_mean",
               "rolloff_var",
@@ -158,7 +161,7 @@ def create_csv_file_with_labels():
               "mfcc18_mean", "mfcc18_var", "mfcc19_mean", "mfcc19_var", "mfcc20_mean", "mfcc20_var", "label"]
 
     # open the file in the write mode
-    f = open('data/features_30_sec_with_noise.csv', 'w', encoding='UTF8', newline='')
+    f = open('data/features_30_sec_original.csv', 'w', encoding='UTF8', newline='')
     # create the csv writer
     writer = csv.writer(f)
     writer.writerow(labels)

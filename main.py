@@ -15,7 +15,8 @@ warnings.filterwarnings('ignore')
 
 import os
 from genreclassification import genre_classification
-from soundswithnoise import save_to_csv
+from soundswithnoise import save_to_csv, test
+from splitsounds import split_sounds
 
 general_path = 'data'
 print(list(os.listdir(f'{general_path}/genres_original/')))
@@ -236,9 +237,11 @@ def visualization():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    visualization()
-    #genre_classification()
+    #visualization()
+    genre_classification()
+    #split_sounds('rock')
     #save_to_csv('data/genres_original/')
-    #save_to_csv('data/song_with_noise/')
+    #save_to_csv('data/song_with_noise_5sec/')
+    #test('rock')
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

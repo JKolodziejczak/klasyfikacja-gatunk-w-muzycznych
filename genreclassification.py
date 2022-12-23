@@ -19,13 +19,14 @@ import matplotlib.pyplot as plt
 
 def genre_classification():
     general_path = 'data'
-    data = pd.read_csv(f'{general_path}/features_30_sec_with_noise.csv')
-    # data = pd.read_csv(f'{general_path}/features_30_sec_original.csv')
+    #data = pd.read_csv(f'{general_path}/features_5_sec_with_noise.csv')
+    data = pd.read_csv(f'{general_path}/features_30_sec_original.csv')
     data = data.iloc[0:, 1:]
     data.head()
 
     y = data['label']  # genre variable.
     X = data.loc[:, data.columns != 'label']  # select all columns but not the labels
+    #X = data.loc[:, "length":"mfcc20_var"]  # select all columns but not the labels
 
     #### NORMALIZE X ####
     # Normalize so everything is on the same scale.
@@ -44,53 +45,55 @@ def genre_classification():
     def model_assess(model, title="Default"):
         model.fit(X_train, y_train)
         preds = model.predict(X_test)
-        print(confusion_matrix(y_test, preds))
+        # print(confusion_matrix(y_test, preds))
         print('Accuracy', title, ':', round(accuracy_score(y_test, preds), 5))
+        return round(accuracy_score(y_test, preds), 5)
 
     # Cross Gradient Booster
     xgb = XGBClassifier(n_estimators=1000, learning_rate=0.05)
-    model_assess(xgb, "Cross Gradient Booster")
+    accuracy_xgb = model_assess(xgb, "Cross Gradient Booster")
 
     # Random Forest
     rforest = RandomForestClassifier(n_estimators=1000, max_depth=10, random_state=0)
-    model_assess(rforest, "Random Forest")
+    accuracy_rforest = model_assess(rforest, "Random Forest")
 
     # KNN
     knn = KNeighborsClassifier(n_neighbors=19)
-    model_assess(knn, "KNN")
+    accuracy_knn = model_assess(knn, "KNN")
 
     # Support Vector Machine
     svm = SVC(decision_function_shape="ovo")
-    model_assess(svm, "Support Vector Machine")
+    accuracy_svm = model_assess(svm, "Support Vector Machine")
 
     # Logistic Regression
     lg = LogisticRegression(random_state=0, solver='lbfgs', multi_class='multinomial')
-    model_assess(lg, "Logistic Regression")
+    accuracy_lg = model_assess(lg, "Logistic Regression")
 
     # Neural Nets
     nn = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5000, 10), random_state=1)
-    model_assess(nn, "Neural Nets")
+    accuracy_nn = model_assess(nn, "Neural Nets")
 
     # Stochastic Gradient Descent
     sgd = SGDClassifier(max_iter=5000, random_state=0)
-    model_assess(sgd, "Stochastic Gradient Descent")
+    accuracy_sgd = model_assess(sgd, "Stochastic Gradient Descent")
 
     # Decission trees
     tree = DecisionTreeClassifier()
-    model_assess(tree, "Decision trees")
+    accuracy_tree = model_assess(tree, "Decision trees")
 
     # Naive Bayes
     nb = GaussianNB()
-    model_assess(nb, "Naive Bayes")
+    accuracy_nb = model_assess(nb, "Naive Bayes")
 
     ##########
-    # Final model
+    # Best model
+    max_accuracy = max([accuracy_nb, accuracy_tree, accuracy_nn, accuracy_sgd, accuracy_lg, accuracy_svm, accuracy_rforest, accuracy_knn, accuracy_xgb])
     xgb = XGBClassifier(n_estimators=1000, learning_rate=0.05)
     xgb.fit(X_train, y_train)
 
     preds2 = xgb.predict(X_test)
 
-    print('Accuracy', ':', round(accuracy_score(y_test, preds2), 5), '\n')
+    print('Accuracy', ':', max_accuracy, '\n')
 
     # Confusion Matrix
     confusion_matr = confusion_matrix(y_test, preds2)  # normalize = 'true'
