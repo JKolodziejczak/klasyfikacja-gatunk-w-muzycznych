@@ -16,11 +16,17 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+from sklearn import decomposition, datasets
+from sklearn import tree
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV
+from sklearn.preprocessing import StandardScaler
+
 
 def genre_classification():
     general_path = 'data'
     #data = pd.read_csv(f'{general_path}/features_5_sec_with_noise.csv')
-    data = pd.read_csv(f'{general_path}/features_30_sec_original.csv')
+    data = pd.read_csv(f'{general_path}/features_5_sec_original.csv')
     data = data.iloc[0:, 1:]
     data.head()
 
@@ -49,36 +55,51 @@ def genre_classification():
         print('Accuracy', title, ':', round(accuracy_score(y_test, preds), 5))
         return round(accuracy_score(y_test, preds), 5)
 
+    ne = [50,100,200,300,400,500,600,700,800,900,1000]
+    lr = [0.01,0.05,0.1,0.15,0.2,0.25,0.3]
+    max_acc = 0
+    max_ne = 0
+    max_lr = 0
+
     # Cross Gradient Booster
-    xgb = XGBClassifier(n_estimators=1000, learning_rate=0.05)
+    # for n_estimators in ne:
+    #     for learning_rate in lr:
+    #         print("ne: "+str(n_estimators)+", lr: "+str(learning_rate))
+    #         xgb = XGBClassifier(n_estimators=n_estimators, learning_rate=learning_rate)
+    xgb = XGBClassifier(n_estimators=300, learning_rate=0.25)
     accuracy_xgb = model_assess(xgb, "Cross Gradient Booster")
+    #         if max_acc<accuracy_xgb:
+    #             max_acc = accuracy_xgb
+    #             max_ne = n_estimators
+    #             max_lr = learning_rate
+    # print("WINNER ne: " + str(max_ne) + ", lr: " + str(max_lr)+", accuracy: "+ str(max_acc))
 
     # Random Forest
-    rforest = RandomForestClassifier(n_estimators=1000, max_depth=10, random_state=0)
+    rforest = RandomForestClassifier(n_estimators=500, max_depth=20)
     accuracy_rforest = model_assess(rforest, "Random Forest")
 
     # KNN
-    knn = KNeighborsClassifier(n_neighbors=19)
+    knn = KNeighborsClassifier(n_neighbors=3)
     accuracy_knn = model_assess(knn, "KNN")
 
     # Support Vector Machine
-    svm = SVC(decision_function_shape="ovo")
+    svm = SVC(kernel="poly", gamma=3)
     accuracy_svm = model_assess(svm, "Support Vector Machine")
 
     # Logistic Regression
-    lg = LogisticRegression(random_state=0, solver='lbfgs', multi_class='multinomial')
+    lg = LogisticRegression(solver='lbfgs', multi_class='ovr', penalty='none')
     accuracy_lg = model_assess(lg, "Logistic Regression")
 
     # Neural Nets
-    nn = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5000, 10), random_state=1)
+    nn = MLPClassifier(solver='adam', alpha=1e-4, hidden_layer_sizes=(1000, 100))
     accuracy_nn = model_assess(nn, "Neural Nets")
 
-    # Stochastic Gradient Descent
-    sgd = SGDClassifier(max_iter=5000, random_state=0)
+    # # Stochastic Gradient Descent
+    sgd = SGDClassifier(max_iter=500, alpha=1e-4, penalty="l1", loss="log_loss")
     accuracy_sgd = model_assess(sgd, "Stochastic Gradient Descent")
 
     # Decission trees
-    tree = DecisionTreeClassifier()
+    tree = DecisionTreeClassifier(criterion="entropy", max_depth=20)
     accuracy_tree = model_assess(tree, "Decision trees")
 
     # Naive Bayes
@@ -113,3 +134,36 @@ def genre_classification():
     perm.fit(X_test, y_test)
 
     eli5.show_weights(estimator=perm, feature_names=X_test.columns.tolist())
+
+
+def optimal_params():
+    general_path = 'data'
+    data = pd.read_csv(f'{general_path}/features_30_sec_original.csv')
+    data = data.iloc[0:, 1:]
+    data.head()
+
+    y = data['label']  # genre variable.
+    X = data.loc[:, data.columns != 'label']
+    cols = X.columns
+    min_max_scaler = preprocessing.MinMaxScaler()
+    np_scaled = min_max_scaler.fit_transform(X)
+
+    # new data frame with the new scaled data.
+    X = pd.DataFrame(np_scaled, columns=cols)
+    std_slc = StandardScaler()
+    pca = decomposition.PCA()
+    dec_tree = tree.DecisionTreeClassifier()
+    pipe = Pipeline(steps=[('std_slc', std_slc),
+                           ('pca', pca),
+                           ('dec_tree', dec_tree)])
+    criterion = ['gini', 'entropy']
+    max_depth = [2, 4, 6, 8, 10, 12, 15, 18, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100]
+    parameters = dict(dec_tree__criterion=criterion,
+                      dec_tree__max_depth=max_depth)
+
+    clf_GS = GridSearchCV(pipe, parameters)
+    clf_GS.fit(X, y)
+    print('Best Criterion:', clf_GS.best_estimator_.get_params()['dec_tree__criterion'])
+    print('Best max_depth:', clf_GS.best_estimator_.get_params()['dec_tree__max_depth'])
+    print();
+    print(clf_GS.best_estimator_.get_params()['dec_tree'])

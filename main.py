@@ -14,7 +14,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 import os
-from genreclassification import genre_classification
+from genreclassification import genre_classification, optimal_params
 from soundswithnoise import save_to_csv, test
 from splitsounds import split_sounds
 
@@ -243,5 +243,6 @@ if __name__ == '__main__':
     #save_to_csv('data/genres_original/')
     #save_to_csv('data/song_with_noise_5sec/')
     #test('rock')
+    #optimal_params()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
