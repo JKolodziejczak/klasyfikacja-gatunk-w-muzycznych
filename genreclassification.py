@@ -25,8 +25,9 @@ from sklearn.preprocessing import StandardScaler
 
 def genre_classification():
     general_path = 'data'
-    #data = pd.read_csv(f'{general_path}/features_5_sec_with_noise.csv')
-    data = pd.read_csv(f'{general_path}/features_5_sec_original.csv')
+    data = pd.read_csv(f'{general_path}/features_30_sec_with_noise.csv')
+    # data = pd.read_csv(f'{general_path}/features_30_sec_original.csv')
+    #data = pd.read_csv(f'{general_path}/features_5_sec_all.csv')
     data = data.iloc[0:, 1:]
     data.head()
 
@@ -55,11 +56,11 @@ def genre_classification():
         print('Accuracy', title, ':', round(accuracy_score(y_test, preds), 5))
         return round(accuracy_score(y_test, preds), 5)
 
-    ne = [50,100,200,300,400,500,600,700,800,900,1000]
-    lr = [0.01,0.05,0.1,0.15,0.2,0.25,0.3]
-    max_acc = 0
-    max_ne = 0
-    max_lr = 0
+    # ne = [50,100,200,300,400,500,600,700,800,900,1000]
+    # lr = [0.01,0.05,0.1,0.15,0.2,0.25,0.3]
+    # max_acc = 0
+    # max_ne = 0
+    # max_lr = 0
 
     # Cross Gradient Booster
     # for n_estimators in ne:

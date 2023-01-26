@@ -15,7 +15,7 @@ warnings.filterwarnings('ignore')
 
 import os
 from genreclassification import genre_classification, optimal_params
-from soundswithnoise import save_to_csv, test
+from soundswithnoise import save_to_csv, add_noise
 from splitsounds import split_sounds
 
 general_path = 'data'
@@ -238,6 +238,7 @@ def visualization():
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     #visualization()
+    #add_noise("blues")
     genre_classification()
     #split_sounds('rock')
     #save_to_csv('data/genres_original/')

@@ -22,7 +22,7 @@ def get_noise_from_sound(signal, noise, SNR):
     return noise
 
 
-def test(dir):
+def add_noise(dir):
     APP_FOLDER = 'data/genres_original/' + dir + "/"
     noise_file = 'data/noise_sample/pub3.wav'
     noise, sr = librosa.load(noise_file)
@@ -42,8 +42,6 @@ def test(dir):
             # plt.figure()
 
             # crop noise if its longer than signal
-            # for this code len(noise) shold be greater than len(signal)
-            # it will not work otherwise!
 
             if len(noise) > len(signal):
                 noise = noise[0:len(signal)]
@@ -93,8 +91,8 @@ def save_to_csv(path):
 
             length = len(audio)
 
-            # if length<110200:
-            #     continue
+            if length < 110000:
+                continue
 
             splitted_path = base.split("/")
             genre = splitted_path[len(splitted_path) - 1]
@@ -161,7 +159,7 @@ def create_csv_file_with_labels():
               "mfcc18_mean", "mfcc18_var", "mfcc19_mean", "mfcc19_var", "mfcc20_mean", "mfcc20_var", "label"]
 
     # open the file in the write mode
-    f = open('data/features_30_sec_original.csv', 'w', encoding='UTF8', newline='')
+    f = open('data/features_5_sec_with_noise.csv', 'w', encoding='UTF8', newline='')
     # create the csv writer
     writer = csv.writer(f)
     writer.writerow(labels)
