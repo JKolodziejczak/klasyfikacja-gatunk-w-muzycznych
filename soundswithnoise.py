@@ -7,8 +7,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.io.wavfile import write
 
-snrs_to_test = [-15, -12, -9, -6, -3, 0, 3, 6, 9, 12, 15]
-
 
 def get_noise_from_sound(signal, noise, SNR):
     RMS_s = math.sqrt(np.mean(signal ** 2))
@@ -40,8 +38,6 @@ def add_noise(dir):
             # plt.show(block=False)
             # plt.pause(1)
             # plt.figure()
-
-            # crop noise if its longer than signal
 
             if len(noise) > len(signal):
                 noise = noise[0:len(signal)]
@@ -158,9 +154,7 @@ def create_csv_file_with_labels():
               "mfcc17_var",
               "mfcc18_mean", "mfcc18_var", "mfcc19_mean", "mfcc19_var", "mfcc20_mean", "mfcc20_var", "label"]
 
-    # open the file in the write mode
     f = open('data/features_5_sec_with_noise.csv', 'w', encoding='UTF8', newline='')
-    # create the csv writer
     writer = csv.writer(f)
     writer.writerow(labels)
     return writer

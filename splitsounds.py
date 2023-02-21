@@ -20,10 +20,6 @@ def split_sounds(dir):
             segment_length = sr * segment_dur_secs
 
             num_sections = int(np.ceil(len(wave) / segment_length))
-            print(num_sections)
-            print(len(wave))
-            print(segment_length)
-            print(np.ceil(len(wave) / segment_length))
 
             split = []
 
